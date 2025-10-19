@@ -1,0 +1,179 @@
+body {
+    font-family: 'Noto Sans', sans-serif;
+}
+
+.footer .icon-link {
+    font-size: 25px;
+    color: #000;
+}
+
+.link-block {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.link-block a {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.hero .hero-body {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.publication-title {
+    font-family: 'Noto Sans', sans-serif;
+    margin-bottom: 1rem;
+}
+
+.publication-authors {
+    font-family: 'Noto Sans', sans-serif;
+    margin-bottom: 0.5rem;
+}
+
+.publication-authors a {
+    color: hsl(204, 86%, 53%) !important;
+}
+
+.publication-authors a:hover {
+    text-decoration: underline;
+}
+
+.author-block {
+    display: inline-block;
+}
+
+section.section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+}
+
+#tldr {
+    background-color: white;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+}
+
+#tldr .content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+    border-left: 4px solid #2196F3;
+}
+
+.content h3.title.is-4 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.content h4 {
+    margin: 1.5rem 0 0.5rem 0;
+}
+
+.content p {
+    margin-bottom: 1rem;
+}
+
+.box {
+    height: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5em 1.5em -0.125em rgba(10, 10, 10, 0.15), 
+                0 0px 0 1px rgba(10, 10, 10, 0.02);
+}
+
+.box h4 {
+    margin-top: 0 !important;
+    margin-bottom: 1rem !important;
+}
+
+figure {
+    margin: 2rem 0;
+}
+
+figure img {
+    border-radius: 6px;
+    box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1);
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+figure.image {
+    text-align: center;
+}
+
+/* Specific image size controls - add these classes to your images */
+.image-small img {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.image-medium img {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.image-large img {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.image-full img {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+pre {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+}
+
+.bibtex-box {
+    background-color: #e3f2fd;
+    padding: 1.5rem;
+    border-radius: 6px;
+    border-left: 4px solid #2196F3;
+}
+
+.bibtex-box pre {
+    background-color: transparent;
+}
+
+code {
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: 0.875rem;
+    background-color: transparent;
+    color: #363636;
+}
+
+.footer {
+    background-color: #fafafa;
+    padding: 3rem 1.5rem;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .hero .hero-body {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    .title.is-1 {
+        font-size: 2rem;
+    }
+    
+    .subtitle.is-3 {
+        font-size: 1.25rem;
+    }
+    
+    .link-block {
+        display: block;
+        margin: 0.5rem 0;
+    }
+}
