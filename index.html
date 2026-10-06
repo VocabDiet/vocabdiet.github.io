@@ -3,263 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vocab Diet: Reshaping the Vocabulary of LLMs with Vector Arithmetic</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Mono&display=swap">
+    <title>Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic</title>
+    <meta name="description" content="Vocab Diet composes word forms from a shared base word and transformation vectors (walked = walk + past tense), freeing 10–40% of vocabulary slots for other languages and domains with minimal impact on performance. Findings of ACL 2026.">
+    <meta property="og:title" content="Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic">
+    <meta property="og:description" content="Compose word forms from a base word and transformation vectors (walked = walk + past tense), freeing 10–40% of vocabulary slots. Findings of ACL 2026.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vocabdiet.github.io/">
+    <meta property="og:image" content="https://vocabdiet.github.io/images/vocabulary.png">
+    <meta property="og:image:alt" content="24.6k English word tokens in the GPT-4 tokenizer reduce to 14.3k base forms, which can also compose 98k out-of-vocabulary words.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="citation_title" content="Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic">
+    <meta name="citation_author" content="Reif, Yuval">
+    <meta name="citation_author" content="Kaplan, Guy">
+    <meta name="citation_author" content="Schwartz, Roy">
+    <meta name="citation_publication_date" content="2026">
+    <meta name="citation_conference_title" content="Findings of the Association for Computational Linguistics: ACL 2026">
+    <meta name="citation_doi" content="10.18653/v1/2026.findings-acl.1618">
+    <meta name="citation_arxiv_id" content="2510.17001">
+    <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2510.17001">
+    <link rel="canonical" href="https://vocabdiet.github.io/">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;family=Noto+Sans+Mono&amp;display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <section class="hero">
-        <div class="hero-body">
-            <div class="container is-max-desktop">
-                <div class="columns is-centered">
-                    <div class="column has-text-centered">
-                        <h1 class="title is-1 publication-title">Vocab Diet: Reshaping the Vocabulary of LLMs with Vector Arithmetic</h1>
-                        <!-- <h2 class="subtitle is-3 publication-title"></h2> -->
-                        <div class="is-size-5 publication-authors">
-                            <span class="author-block">Yuval Reif,</span>
-                            <span class="author-block">Guy Kaplan,</span>
-                            <span class="author-block">Roy Schwartz</span>
-                        </div>
-                        <div class="is-size-5 publication-authors">
-                            <span class="author-block">The Hebrew University of Jerusalem</span>
-                        </div>
-                        <div class="column has-text-centered">
-                            <div class="link-block">
-                                <a href="https://arxiv.org/abs/" class="external-link button is-normal is-rounded is-dark">
-                                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
-                                    <span>Paper</span>
-                                </a>
-                            </div>
-                            <div class="link-block">
-                                <a href="https://github.com/schwartz-lab-NLP/VocabDiet" class="external-link button is-normal is-rounded is-dark">
-                                    <span class="icon"><i class="fab fa-github"></i></span>
-                                    <span>Code</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section class="section" id="tldr">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered has-text-justified">
-                <div class="column is-four-fifths">
-                    <div class="content is-size-5">
-                        <em><strong>TL;DR:</strong> We show that LLMs encode morphological variations (e.g., "walk"→"walked") as linear transformations in embedding space. By composing words from base forms + transformation vectors, we reduce vocabulary size by up to 10% while expanding coverage to out-of-vocabulary words—all without modifying model weights or sacrificing downstream performance.</em>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<header>
+    <h1>Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic</h1>
+    <p class="authors"><span>Yuval Reif</span> <span>Guy Kaplan</span> <span>Roy Schwartz</span></p>
+    <p class="affil">The Hebrew University of Jerusalem</p>
+    <p class="affil">Findings of ACL 2026</p>
+    <nav class="links">
+        <a class="button" href="https://arxiv.org/abs/2510.17001"><i class="ai ai-arxiv"></i> arXiv</a>
+        <a class="button" href="https://aclanthology.org/2026.findings-acl.1618/"><i class="fas fa-file-pdf"></i> Paper</a>
+        <a class="button" href="https://github.com/schwartz-lab-NLP/VocabDiet"><i class="fab fa-github"></i> Code</a>
+    </nav>
+</header>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Abstract</h2>
-                    <div class="content has-text-justified">
-                        <p>
-                            Large language models (LLMs) were shown to encode word form variations, such as 
-                            "walk"→"walked", as linear directions in embedding space. However, standard tokenization 
-                            algorithms treat these variations as distinct tokens—filling the size-capped vocabulary with 
-                            surface form variants (e.g., "walk", "walking", "Walk"), at the expense of less frequent words 
-                            and multilingual coverage.
-                        </p>
-                        <p>
-                            We show that many of these variations can be captured by <strong>transformation vectors</strong>—additive 
-                            offsets that yield the appropriate word's representation when applied to the base form word 
-                            embedding—in both the input and output spaces. Building on this, we propose a compact reshaping 
-                            of the vocabulary: rather than assigning unique tokens to each surface form, we compose them from 
-                            shared base form and transformation vectors (e.g., "walked" = "walk" + past tense).
-                        </p>
-                        <p>
-                            We apply our approach to multiple LLMs and across five languages, removing up to 10% of vocabulary 
-                            entries—thereby freeing space to allocate new, more diverse tokens. Importantly, we do so while 
-                            also expanding vocabulary coverage to out-of-vocabulary words, with minimal impact on downstream 
-                            performance, and without modifying model weights.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<main>
+    <p class="tldr"><strong>TL;DR:</strong> LLMs often encode word-form variation (<em>walk</em> → <em>walked</em>) as linear directions in embedding space. We use this to build compositional vocabularies: instead of a separate token for every surface form, words are composed from a shared base word and transformation vectors (<em>walked</em> = <em>walk</em> + <em>past tense</em>), at both input and output. This frees 10–40% of vocabulary slots for other languages and domains, also covers out-of-vocabulary words, and has minimal impact on downstream performance.</p>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Method Overview</h2>
-                    <div class="content has-text-justified">
-                        <figure class="image">
-                            <img src="images/figure1.png" alt="Compositional vocabulary for LLMs" style="max-width: 500px; margin: 0 auto; box-shadow: none;">
-                        </figure>
-                        <p class="has-text-centered">
-                            <strong>Figure 1:</strong> Compositional vocabulary for LLMs. Input tokens are decomposed into 
-                            base words and transformations, while output predictions combine logits from both vocabularies.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <h2>The idea</h2>
+    <p>Tokenizers give common words a separate token for each form: <em>walk</em>, <em>walks</em>, <em>walking</em>, <em>Walk</em>. The GPT-4 tokenizer has 24.6k English whole-word tokens. Ignoring case leaves 17.7k, and grouping inflections and derivations leaves 14.3k base words, 42% fewer. The same base words and transformations can also compose 98k English words that are currently split into several tokens.</p>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Key Findings</h2>
-                    <div class="content has-text-justified">
-                        <div class="columns is-multiline">
-                            <div class="column is-half">
-                                <div class="box">
-                                    <h4 class="title is-5">📊 Vocabulary Redundancy</h4>
-                                    <p>
-                                        Analysis of the GPT-4 tokenizer reveals that 24.6k English whole-word tokens can be reduced 
-                                        to just 14.3k base forms (42% reduction) when accounting for case, inflection, and derivation.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="column is-half">
-                                <div class="box">
-                                    <h4 class="title is-5">🔄 Compositional Representations</h4>
-                                    <p>
-                                        LLMs naturally interpret compositional embeddings (base + transformation) as their intended 
-                                        surface forms, even for out-of-vocabulary words never seen as single tokens during pretraining.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="column is-half">
-                                <div class="box">
-                                    <h4 class="title is-5">🌍 Multilingual Success</h4>
-                                    <p>
-                                        The approach works across morphologically diverse languages: English, Arabic, German, Russian, 
-                                        and Spanish, with particularly strong results for inflectional transformations.
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="column is-half">
-                                <div class="box">
-                                    <h4 class="title is-5">⚡ Minimal Performance Impact</h4>
-                                    <p>
-                                        Compositional vocabularies achieve comparable performance to baseline models across diverse 
-                                        benchmarks, while reducing decoding speed by only 0.8%.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <figure>
+        <img src="images/vocabulary.png" alt="Left: 24.6k English word tokens in the GPT-4 tokenizer reduce to 17.7k without case and 14.3k base forms. Right: the same bases and transformations compose 98k out-of-vocabulary words." style="max-width:620px">
+        <figcaption>English word tokens in the GPT-4 tokenizer (left), and the out-of-vocabulary words the same base forms and transformations can compose (right).</figcaption>
+    </figure>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Vocabulary Structure Analysis</h2>
-                    <div class="content has-text-justified">
-                        <figure class="image">
-                            <img src="images/figure2.png" alt="Structure in LLM vocabularies" style="max-width: 600px; margin: 0 auto; box-shadow: none;">
-                        </figure>
-                        <p class="has-text-centered">
-                            <strong>Figure 2:</strong> Many in-vocabulary English word tokens are surface variants of other 
-                            tokens. The same base forms and transformations can compose over 98k currently out-of-vocabulary words.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <p>Vocab Diet removes surface forms from the embedding tables and represents each as its base plus a small set of transformation vectors. At the input, the word's embedding is the sum of the two. At the output, the model scores a word by adding its base and transformation logits. Each transformation vector starts as the average embedding offset between word pairs that show it, such as <em>walk</em> → <em>walked</em> for past tense.</p>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Results</h2>
-                    <div class="content has-text-justified">
-                        <h3 class="title is-4">Patchscopes Interpretation Accuracy</h3>
-                        <p>
-                            We use Patchscopes to verify whether LLMs correctly interpret compositional embeddings. 
-                            Results show high accuracy for inflections and capitalization, both for in-vocabulary and 
-                            out-of-vocabulary words.
-                        </p>
-                        <figure class="image">
-                            <img src="images/table1.png" alt="English results table" style="max-width: 500px; margin: 0 auto; box-shadow: none;">
-                        </figure>
-                        <p class="has-text-centered">
-                            <strong>Table 1:</strong> Compositional embeddings are successfully resolved for most inflectional forms, even for 
-                            out-of-vocabulary words.
-                        </p>
-                        
-                        <h3 class="title is-4">Downstream Performance</h3>
-                        <p>
-                            Models with compositional vocabularies achieve comparable performance to baseline models across 
-                            a suite of benchmarks including MMLU, ARC, HellaSwag, TriviaQA, and more—despite restructuring 
-                            up to 10% of the vocabulary.
-                        </p>
-                        <figure class="image">
-                            <img src="images/table2.png" alt="Downstream results on English" style="max-width: 500px; margin: 0 auto; box-shadow: none;">
-                        </figure>
-                        <p class="has-text-centered">
-                            <strong>Table 3:</strong> Downstream performance of English compositional-vocabulary models compared to 
-                            unmodified baseline (Llama-3-8B). Our framework performs on-par with the baseline model across diverse tasks.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <figure>
+        <img src="images/method.png" alt="Method: (a) decompose words into base words and transformations and embed them, (b) sum into compositional embeddings, (c) project the output hidden state onto the base and transformation vocabularies, (d) combine into logits over the full vocabulary." style="max-width:460px">
+        <figcaption>(a–b) Input words are decomposed into a base word and transformations, and their embeddings are summed: <em>Raining</em> = <em>rain</em> + <em>gerund</em> + <em>capital</em>. (c–d) The output hidden state is scored against both vocabularies, and the scores are combined into next-token probabilities.</figcaption>
+    </figure>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Vocabulary Size vs. Morphological Compositionality</h2>
-                    <div class="content has-text-justified">
-                        <figure class="image">
-                            <img src="images/figure3.png" alt="Scaling analysis" style="max-width: 800px; margin: 0 auto; box-shadow: none;">
-                        </figure>
-                        <p class="has-text-centered">
-                            <strong>Figure 3:</strong> Linear representation of morphology in embeddings weakens as vocabulary 
-                            size increases. Models with compact vocabularies encode morphology through consistent vector offsets, 
-                            while large-vocabulary models represent inflections as individual lexical units.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <h2>Do LLMs understand compositional embeddings?</h2>
+    <p>We feed <code>Llama-3.1-8B</code> composed embeddings and read them out with Patchscopes, checking whether the model interprets each one as the intended word, either at the embedding layer (<em>embed</em>) or within its first 10 layers (<em>detok</em>). Inflections and capitalization are usually resolved correctly, including for many words that are not a single token in the vocabulary. Derivations mostly fail. Results are similar for Arabic, German, Russian and Spanish.</p>
 
-    <section class="section">
-        <div class="container is-max-desktop">
-            <div class="columns is-centered">
-                <div class="column is-full-width">
-                    <h2 class="title is-3">Citation</h2>
-                    <div class="content">
-                        <pre><code>@article{reif2025vocabdiet,
-  title={Vocab Diet: Reshaping the Vocabulary of LLMs with Vector Arithmetic},
-  author={Reif, Yuval and Kaplan, Guy and Schwartz, Roy},
-  journal={arXiv preprint arXiv:},
-  year={2025}
+    <figure class="scroll-x">
+        <table>
+            <thead>
+                <tr><th></th><th colspan="3">In vocabulary</th><th colspan="3">Out of vocabulary</th></tr>
+                <tr><th>Transformation</th><th><em>embed</em></th><th><em>detok</em></th><th><em>N</em></th><th><em>embed</em></th><th><em>detok</em></th><th><em>N</em></th></tr>
+            </thead>
+            <tbody>
+                <tr class="group"><td>Inflection</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td class="sub">Plural (N)</td><td>92%</td><td>96%</td><td>0.8k</td><td>30%</td><td>56%</td><td>3.4k</td></tr>
+                <tr><td class="sub">Plural (N) &amp; Present Sg. (V)</td><td>87%</td><td>91%</td><td>1.6k</td><td>43%</td><td>75%</td><td>2.1k</td></tr>
+                <tr><td class="sub">Present Singular (V)</td><td>90%</td><td>91%</td><td>0.1k</td><td>64%</td><td>82%</td><td>0.3k</td></tr>
+                <tr><td class="sub">Past (V)</td><td>71%</td><td>81%</td><td>0.6k</td><td>9%</td><td>29%</td><td>2.9k</td></tr>
+                <tr><td class="sub">Past Participle (V)</td><td>64%</td><td>93%</td><td>14</td><td>14%</td><td>38%</td><td>21</td></tr>
+                <tr><td class="sub">Gerund (V)</td><td>83%</td><td>93%</td><td>0.2k</td><td>17%</td><td>34%</td><td>3.2k</td></tr>
+                <tr><td class="sub">Superlative (ADJ)</td><td>71%</td><td>94%</td><td>31</td><td>5%</td><td>29%</td><td>0.4k</td></tr>
+                <tr><td class="sub">Comparative (ADJ)</td><td>40%</td><td>83%</td><td>30</td><td>3%</td><td>36%</td><td>0.4k</td></tr>
+                <tr class="group sep"><td>Capitalization</td><td>80%</td><td>89%</td><td>6.0k</td><td>72%</td><td>85%</td><td>8.4k</td></tr>
+                <tr class="group sep"><td>Derivation (all)</td><td>31%</td><td>45%</td><td>51</td><td>0%</td><td>3%</td><td>31.4k</td></tr>
+            </tbody>
+        </table>
+        <figcaption>Patchscopes accuracy for composed embeddings in <code>Llama-3.1-8B</code>. <em>N</em> is the number of words evaluated. Per-suffix derivation results are in the paper.</figcaption>
+    </figure>
+
+    <h2>Compositional language modeling</h2>
+    <p>We then replace the vocabulary of pretrained models with a compositional one. The backbone stays frozen: we train only the transformation vectors (under 0.001% additional parameters) and LoRA adapters on the last 8 layers, using about 5M tokens. This removes about 10k surface-form tokens from <code>Llama-3.1-8B</code> and <code>OLMo-2-7B</code> and 7.8k from <code>Qwen2.5-7B</code>. On English benchmarks, <code>Llama-3.1-8B</code> loses 1.0 point on average. In Arabic, German, Russian and Spanish, the method removes 38–45% of whole-word tokens, with drops of up to 4.5 points. Decoding is 0.8% slower.</p>
+
+    <figure class="scroll-x">
+        <table>
+            <thead><tr><th>Task</th><th>Baseline</th><th>Vocab Diet</th><th>Δ</th></tr></thead>
+            <tbody>
+                <tr><td>MMLU</td><td>65.2</td><td>64.9</td><td>−0.3</td></tr>
+                <tr><td>ARC</td><td>53.6</td><td>52.5</td><td>−1.1</td></tr>
+                <tr><td>BoolQ</td><td>83.2</td><td>83.3</td><td>+0.1</td></tr>
+                <tr><td>TriviaQA (EM)</td><td>66.5</td><td>63.3</td><td>−3.3</td></tr>
+                <tr><td>SQuAD (EM)</td><td>22.1</td><td>20.0</td><td>−2.1</td></tr>
+                <tr><td>HellaSwag</td><td>60.6</td><td>59.5</td><td>−1.1</td></tr>
+                <tr><td>Winogrande</td><td>78.1</td><td>78.6</td><td>+0.5</td></tr>
+                <tr><td>PIQA</td><td>80.3</td><td>79.1</td><td>−1.2</td></tr>
+                <tr><td>COPA</td><td>93.0</td><td>92.0</td><td>−1.0</td></tr>
+                <tr class="sep"><td><strong>Average</strong></td><td><strong>66.9</strong></td><td><strong>65.9</strong></td><td>−1.0</td></tr>
+            </tbody>
+        </table>
+        <figcaption>English downstream results for <code>Llama-3.1-8B</code> with its original vocabulary (Baseline) and a compositional vocabulary (Vocab Diet). Accuracy unless marked EM (exact match).</figcaption>
+    </figure>
+
+    <p>The freed slots can go where tokenization is inefficient. Replacing the 10k English surface forms in the <code>Llama-3.1-8B</code> tokenizer with 2.5k new tokens for each of four languages, at the same vocabulary size, improves bytes per token by 9.3% on average.</p>
+
+    <figure class="scroll-x">
+        <table>
+            <thead><tr><th>Language</th><th>Original</th><th>Reallocated</th><th>Δ</th></tr></thead>
+            <tbody>
+                <tr><td>Arabic</td><td>4.62</td><td>5.46</td><td>+18.0%</td></tr>
+                <tr><td>Russian</td><td>5.59</td><td>5.85</td><td>+4.8%</td></tr>
+                <tr><td>German</td><td>3.59</td><td>3.86</td><td>+7.5%</td></tr>
+                <tr><td>Spanish</td><td>3.80</td><td>4.07</td><td>+7.0%</td></tr>
+                <tr class="sep"><td><strong>Average</strong></td><td>4.40</td><td>4.81</td><td>+9.3%</td></tr>
+            </tbody>
+        </table>
+        <figcaption>Bytes per token (higher is better) on held-out FineWeb-2 text, before and after reallocating the freed slots.</figcaption>
+    </figure>
+
+    <h2>Pretraining with a compositional vocabulary</h2>
+    <p>Compositional vocabularies also work as a design choice for new models. We pretrain 124M-parameter models on 1B tokens, comparing a BPE baseline with an otherwise identical model whose vocabulary is reshaped compositionally. The compositional model predicts the base word first, then its transformations. This removes about 42% of vocabulary entries. English bits per byte stay nearly the same. Spanish, where the model may also compose out-of-vocabulary words, gets more efficient tokenization at somewhat higher bits per byte.</p>
+
+    <figure class="scroll-x">
+        <table>
+            <thead>
+                <tr><th></th><th></th><th colspan="2">Bits per byte ↓</th><th colspan="2">Bytes per token ↑</th></tr>
+                <tr><th>Language</th><th>Vocab. reduction</th><th>BPE</th><th>Vocab Diet</th><th>BPE</th><th>Vocab Diet</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>English</td><td>41.6%</td><td>1.08</td><td>1.09</td><td>–</td><td>–</td></tr>
+                <tr><td>Spanish</td><td>41.8%</td><td>1.00</td><td>1.11</td><td>4.77</td><td>4.92</td></tr>
+            </tbody>
+        </table>
+        <figcaption>Pretraining from scratch: BPE baseline vs. the same vocabulary reshaped compositionally. English keeps the baseline's set of surface forms, so its tokenization is unchanged.</figcaption>
+    </figure>
+
+    <h2>Vocabulary size and linear morphology</h2>
+    <p>Across 13 models, morphology is encoded less linearly as English vocabulary size grows. Models with compact vocabularies (8–10k English words, e.g., <code>Llama-2</code>, <code>Mistral</code>) encode inflections as consistent offsets. Models with large vocabularies (about 40k, e.g., <code>Gemma-2-9B</code>) store inflected forms more as separate words, and weight tying strengthens this trend.</p>
+
+    <figure>
+        <img src="images/scaling.png" alt="Patchscopes accuracy of compositional representations across models ordered by English vocabulary size, for untied and tied embeddings; accuracy decreases as vocabulary size grows.">
+        <figcaption>Patchscopes accuracy for composed embeddings across models, in order of English vocabulary size, for untied and tied embeddings.</figcaption>
+    </figure>
+
+    <h2>Citation</h2>
+<pre><code>@inproceedings{reif-etal-2026-vocab,
+    title = "Vocab Diet: Reshaping the Vocabulary of {LLM}s via Vector Arithmetic",
+    author = "Reif, Yuval  and
+      Kaplan, Guy  and
+      Schwartz, Roy",
+    booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {ACL} 2026",
+    month = jul,
+    year = "2026",
+    address = "San Diego, California, United States",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.findings-acl.1618/",
+    doi = "10.18653/v1/2026.findings-acl.1618",
+    pages = "32334--32352"
 }</code></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+</main>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="content has-text-centered">
-                <p>&copy; 2025 The Hebrew University of Jerusalem</p>
-            </div>
-        </div>
-    </footer>
+<footer>
+    Research from the <a href="https://schwartz-lab-huji.github.io/">Schwartz Lab</a> at the Hebrew University of Jerusalem.
+</footer>
+
 </body>
 </html>
