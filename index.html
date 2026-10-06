@@ -11,7 +11,13 @@
     <meta property="og:url" content="https://vocabdiet.github.io/">
     <meta property="og:image" content="https://vocabdiet.github.io/images/vocabulary.png">
     <meta property="og:image:alt" content="24.6k English word tokens in the GPT-4 tokenizer reduce to 14.3k base forms, which can also compose 98k out-of-vocabulary words.">
+    <meta property="og:site_name" content="Vocab Diet">
+    <meta property="og:image:width" content="1800">
+    <meta property="og:image:height" content="1522">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic">
+    <meta name="twitter:description" content="Compose word forms from a base word and transformation vectors (walked = walk + past tense), freeing 10–40% of vocabulary slots. Findings of ACL 2026.">
+    <meta name="twitter:image" content="https://vocabdiet.github.io/images/vocabulary.png">
     <meta name="citation_title" content="Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic">
     <meta name="citation_author" content="Reif, Yuval">
     <meta name="citation_author" content="Kaplan, Guy">
@@ -20,12 +26,162 @@
     <meta name="citation_conference_title" content="Findings of the Association for Computational Linguistics: ACL 2026">
     <meta name="citation_doi" content="10.18653/v1/2026.findings-acl.1618">
     <meta name="citation_arxiv_id" content="2510.17001">
-    <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2510.17001">
+    <meta name="citation_pdf_url" content="https://aclanthology.org/2026.findings-acl.1618.pdf">
+    <meta name="citation_firstpage" content="32334">
+    <meta name="citation_lastpage" content="32352">
+    <meta name="citation_publisher" content="Association for Computational Linguistics">
+    <meta name="citation_abstract_html_url" content="https://aclanthology.org/2026.findings-acl.1618/">
+    <meta name="author" content="Yuval Reif, Guy Kaplan, Roy Schwartz">
+    <meta name="keywords" content="Vocab Diet, compositional vocabulary, tokenization, vocabulary, morphology, embeddings, vector arithmetic, transformation vectors, LLM, multilingual, Patchscopes">
+    <link rel="icon" href="images/robot.svg" type="image/svg+xml">
+    <link rel="alternate" type="text/markdown" href="llms.txt" title="Plain-text summary for LLMs and agents">
     <link rel="canonical" href="https://vocabdiet.github.io/">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&amp;family=Noto+Sans+Mono&amp;display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.9.4/css/academicons.min.css">
     <link rel="stylesheet" href="style.css">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://vocabdiet.github.io/",
+      "url": "https://vocabdiet.github.io/",
+      "name": "Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic",
+      "about": {
+        "@id": "https://vocabdiet.github.io/#paper"
+      },
+      "mainEntity": {
+        "@id": "https://vocabdiet.github.io/#paper"
+      }
+    },
+    {
+      "@type": "ScholarlyArticle",
+      "@id": "https://vocabdiet.github.io/#paper",
+      "name": "Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic",
+      "headline": "Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic",
+      "alternateName": "Vocab Diet",
+      "abstract": "Large language models (LLMs) often encode word-form variation (e.g., walk vs. walked) as linear directions in the embedding space. However, standard tokenization algorithms treat such variants as distinct words with different vocabulary entries—quickly filling the size-capped token vocabulary with surface-form variation (e.g., walk, walking, Walk), at the expense of diversity and multilingual coverage. We show that many of these variations can be captured by transformation vectors—additive offsets that yield the appropriate word representation when applied to a base form embedding, in both the input and output spaces. Building on this, we propose a compact reshaping of the vocabulary: instead of assigning unique tokens to each surface form, we compose them from shared base form and transformation vectors (e.g., walked is walk+past tense). Our approach is lightweight—keeping the pretrained backbone frozen and only training small adaptation modules. We apply it across five languages and multiple LLMs in both pretraining and post-hoc adaptation, freeing 10–40% of vocabulary slots to be reallocated where tokenization is inefficient. Importantly, we do so while also expanding vocabulary coverage to out-of-vocabulary words, and with minimal impact on downstream performance. Our findings motivate a rethinking of vocabulary design, towards a representation that better matches the underlying structure of language and the practical needs of multilingual coverage.",
+      "author": [
+        {
+          "@type": "Person",
+          "name": "Yuval Reif",
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": "The Hebrew University of Jerusalem",
+            "url": "https://www.huji.ac.il/"
+          }
+        },
+        {
+          "@type": "Person",
+          "name": "Guy Kaplan",
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": "The Hebrew University of Jerusalem",
+            "url": "https://www.huji.ac.il/"
+          }
+        },
+        {
+          "@type": "Person",
+          "name": "Roy Schwartz",
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": "The Hebrew University of Jerusalem",
+            "url": "https://www.huji.ac.il/"
+          }
+        }
+      ],
+      "datePublished": "2026-07",
+      "inLanguage": "en",
+      "keywords": [
+        "Vocab Diet",
+        "compositional vocabulary",
+        "tokenization",
+        "vocabulary",
+        "morphology",
+        "embeddings",
+        "vector arithmetic",
+        "transformation vectors",
+        "LLM",
+        "multilingual",
+        "Patchscopes"
+      ],
+      "url": "https://vocabdiet.github.io/",
+      "sameAs": [
+        "https://arxiv.org/abs/2510.17001",
+        "https://aclanthology.org/2026.findings-acl.1618/",
+        "https://doi.org/10.18653/v1/2026.findings-acl.1618"
+      ],
+      "image": "https://vocabdiet.github.io/images/vocabulary.png",
+      "publication": {
+        "@type": "PublicationEvent",
+        "name": "Findings of the Association for Computational Linguistics: ACL 2026"
+      },
+      "identifier": [
+        {
+          "@type": "PropertyValue",
+          "propertyID": "DOI",
+          "value": "10.18653/v1/2026.findings-acl.1618"
+        },
+        {
+          "@type": "PropertyValue",
+          "propertyID": "arXiv",
+          "value": "2510.17001"
+        }
+      ],
+      "pagination": "32334-32352",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Association for Computational Linguistics"
+      }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://github.com/schwartz-lab-NLP/VocabDiet",
+      "name": "Vocab Diet code",
+      "description": "Post-hoc adaptation, Patchscopes probes, compositional pretraining, and vocabulary reallocation code for Vocab Diet.",
+      "codeRepository": "https://github.com/schwartz-lab-NLP/VocabDiet",
+      "programmingLanguage": [
+        "Python"
+      ],
+      "license": "https://www.apache.org/licenses/LICENSE-2.0",
+      "author": [
+        {
+          "@type": "Person",
+          "name": "Yuval Reif",
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": "The Hebrew University of Jerusalem",
+            "url": "https://www.huji.ac.il/"
+          }
+        },
+        {
+          "@type": "Person",
+          "name": "Guy Kaplan",
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": "The Hebrew University of Jerusalem",
+            "url": "https://www.huji.ac.il/"
+          }
+        },
+        {
+          "@type": "Person",
+          "name": "Roy Schwartz",
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": "The Hebrew University of Jerusalem",
+            "url": "https://www.huji.ac.il/"
+          }
+        }
+      ],
+      "isBasedOn": {
+        "@id": "https://vocabdiet.github.io/#paper"
+      }
+    }
+  ]
+}
+    </script>
 </head>
 <body>
 
@@ -147,6 +303,9 @@
         <img src="images/scaling.png" alt="Patchscopes accuracy of compositional representations across models ordered by English vocabulary size, for untied and tied embeddings; accuracy decreases as vocabulary size grows.">
         <figcaption>Patchscopes accuracy for composed embeddings across models, in order of English vocabulary size, for untied and tied embeddings.</figcaption>
     </figure>
+
+    <h2>Related</h2>
+    <p><a href="https://co-bpe.github.io/">CoBPE</a> (COLM 2026) applies the same input and output parameterization to grammatical markers: articles, prepositions and punctuation attach to a neighboring base token, shortening sequences by 30%.</p>
 
     <h2>Citation</h2>
 <pre class="bibtex"><code>@inproceedings{reif-etal-2026-vocab,

@@ -1,0 +1,39 @@
+# Vocab Diet: Reshaping the Vocabulary of LLMs via Vector Arithmetic
+
+> Vocab Diet builds compositional vocabularies for language models: instead of a separate token for every word form (walk, walked, walking, Walk), words are composed from a shared base word and transformation vectors (walked = walk + past tense), at both input and output. Paper by Yuval Reif, Guy Kaplan and Roy Schwartz (The Hebrew University of Jerusalem), Findings of ACL 2026.
+
+## Key results
+
+- The GPT-4 tokenizer has 24.6k English whole-word tokens; ignoring case leaves 17.7k, and grouping inflections and derivations leaves 14.3k base words (42% fewer). The same bases and transformations can compose 98k further English words.
+- LLMs interpret composed embeddings (base + transformation vector) as the intended word, especially for inflections and capitalization, including many out-of-vocabulary words (Patchscopes, Llama-3.1-8B; also Arabic, German, Russian, Spanish). Derivations mostly fail.
+- Post-hoc adaptation with a frozen backbone (transformation vectors plus LoRA on the last 8 layers) removes ~10k tokens from Llama-3.1-8B and OLMo-2-7B and 7.8k from Qwen2.5-7B; English downstream average 66.9 → 65.9 for Llama-3.1-8B; decoding 0.8% slower.
+- Reallocating the 10k freed slots to Arabic, Russian, German and Spanish (2.5k each) improves bytes per token by 9.3% on average at the same vocabulary size.
+- Pretraining 124M models from scratch with a compositional vocabulary removes ~42% of vocabulary entries (English bits per byte 1.08 vs 1.09).
+- Across 13 models, morphology is encoded less linearly in embeddings as English vocabulary size grows.
+
+## Links
+
+- [Project page](https://vocabdiet.github.io/)
+- [Paper (ACL Anthology)](https://aclanthology.org/2026.findings-acl.1618/), DOI 10.18653/v1/2026.findings-acl.1618
+- [arXiv 2510.17001](https://arxiv.org/abs/2510.17001)
+- [Code](https://github.com/schwartz-lab-NLP/VocabDiet)
+- Related: [CoBPE](https://co-bpe.github.io/) (COLM 2026), which attaches articles, prepositions and punctuation to base tokens.
+
+## Citation
+
+```bibtex
+@inproceedings{reif-etal-2026-vocab,
+    title = "Vocab Diet: Reshaping the Vocabulary of {LLM}s via Vector Arithmetic",
+    author = "Reif, Yuval  and
+      Kaplan, Guy  and
+      Schwartz, Roy",
+    booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {ACL} 2026",
+    month = jul,
+    year = "2026",
+    address = "San Diego, California, United States",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.findings-acl.1618/",
+    doi = "10.18653/v1/2026.findings-acl.1618",
+    pages = "32334--32352"
+}
+```
