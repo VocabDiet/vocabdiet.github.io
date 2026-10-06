@@ -76,3 +76,5 @@ footer { margin-top: 56px; padding-top: 20px; padding-bottom: 40px; border-top: 
     body { font-size: 16px; }
     th, td { padding: 4px 8px; }
 }
+
+pre.bibtex { white-space: pre-wrap; overflow-wrap: anywhere; }

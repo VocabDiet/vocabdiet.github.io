@@ -149,11 +149,15 @@
     </figure>
 
     <h2>Citation</h2>
-<pre><code>@inproceedings{reif-etal-2026-vocab,
+<pre class="bibtex"><code>@inproceedings{reif-etal-2026-vocab,
     title = "Vocab Diet: Reshaping the Vocabulary of {LLM}s via Vector Arithmetic",
     author = "Reif, Yuval  and
       Kaplan, Guy  and
       Schwartz, Roy",
+    editor = "Liakata, Maria  and
+      Moreira, Viviane P.  and
+      Zhang, Jiajun  and
+      Jurgens, David",
     booktitle = "Findings of the {A}ssociation for {C}omputational {L}inguistics: {ACL} 2026",
     month = jul,
     year = "2026",
@@ -161,7 +165,9 @@
     publisher = "Association for Computational Linguistics",
     url = "https://aclanthology.org/2026.findings-acl.1618/",
     doi = "10.18653/v1/2026.findings-acl.1618",
-    pages = "32334--32352"
+    pages = "32334--32352",
+    ISBN = "979-8-89176-395-1",
+    abstract = "Large language models (LLMs) often encode word-form variation (e.g., \textit{walk} vs. \textit{walk\textbf{ed}}) as linear directions in the embedding space. However, standard tokenization algorithms treat such variants as distinct words with different vocabulary entries{---}quickly filling the size-capped token vocabulary with surface-form variation (e.g., \textit{walk}, \textit{walk\textbf{ing}}, \textit{\textbf{W}alk}), at the expense of diversity and multilingual coverage. We show that many of these variations can be captured by \textit{transformation} vectors{---}additive offsets that yield the appropriate word representation when applied to a \textit{base form} embedding, in both the input and output spaces. Building on this, we propose a compact reshaping of the vocabulary: instead of assigning unique tokens to each surface form, we compose them from shared \textit{base form} and \textit{transformation} vectors (e.g., \textit{walked} is \textit{walk}+\textit{past tense}). Our approach is lightweight{---}keeping the pretrained backbone frozen and only training small adaptation modules. We apply it across five languages and multiple LLMs in both pretraining and post-hoc adaptation, freeing 10-40{\%} of vocabulary slots to be reallocated where tokenization is inefficient. Importantly, we do so while also expanding vocabulary coverage to out-of-vocabulary words, and with minimal impact on downstream performance. Our findings motivate a rethinking of vocabulary design, towards a representation that better matches the underlying structure of language and the practical needs of multilingual coverage."
 }</code></pre>
 </main>
 
