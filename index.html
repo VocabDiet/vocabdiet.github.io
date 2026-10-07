@@ -200,25 +200,45 @@
 <main>
     <p class="tldr"><strong>TL;DR:</strong> LLMs often encode word-form variation (<em>walk</em> → <em>walked</em>) as linear directions in embedding space. We use this to build compositional vocabularies: instead of a separate token for every surface form, words are composed from a shared base word and transformation vectors (<em>walked</em> = <em>walk</em> + <em>past tense</em>), at both input and output. This frees 10–40% of vocabulary slots for other languages and domains, also covers out-of-vocabulary words, and has minimal impact on downstream performance.</p>
 
-    <h2>The idea</h2>
+    <h2>Vocabularies spend many entries on forms of the same word</h2>
     <p>Tokenizers give common words a separate token for each form: <em>walk</em>, <em>walks</em>, <em>walking</em>, <em>Walk</em>. The GPT-4 tokenizer has 24.6k English whole-word tokens. Ignoring case leaves 17.7k, and grouping inflections and derivations leaves 14.3k base words, 42% fewer. The same base words and transformations can also compose 98k English words that are currently split into several tokens.</p>
 
     <figure>
-        <img src="images/vocabulary.png" alt="Left: 24.6k English word tokens in the GPT-4 tokenizer reduce to 17.7k without case and 14.3k base forms. Right: the same bases and transformations compose 98k out-of-vocabulary words." style="max-width:620px">
+        <img src="images/vocabulary.png" alt="Left: 24.6k English word tokens in the GPT-4 tokenizer reduce to 17.7k without case and 14.3k base forms. Right: the same bases and transformations compose 98k out-of-vocabulary words." style="max-width:min(100%,620px)">
         <figcaption>English word tokens in the GPT-4 tokenizer (left), and the out-of-vocabulary words the same base forms and transformations can compose (right).</figcaption>
     </figure>
 
+    <h2>Vocab Diet composes words from a base and transformation vectors</h2>
     <p>Vocab Diet removes surface forms from the embedding tables and represents each as its base plus a small set of transformation vectors. At the input, the word's embedding is the sum of the two. At the output, the model scores a word by adding its base and transformation logits. Each transformation vector starts as the average embedding offset between word pairs that show it, such as <em>walk</em> → <em>walked</em> for past tense.</p>
 
     <figure>
-        <img src="images/method.png" alt="Method: (a) decompose words into base words and transformations and embed them, (b) sum into compositional embeddings, (c) project the output hidden state onto the base and transformation vocabularies, (d) combine into logits over the full vocabulary." style="max-width:460px">
+        <img src="images/method.png" alt="Method: (a) decompose words into base words and transformations and embed them, (b) sum into compositional embeddings, (c) project the output hidden state onto the base and transformation vocabularies, (d) combine into logits over the full vocabulary." style="max-width:min(100%,460px)">
         <figcaption>(a–b) Input words are decomposed into a base word and transformations, and their embeddings are summed: <em>Raining</em> = <em>rain</em> + <em>gerund</em> + <em>capital</em>. (c–d) The output hidden state is scored against both vocabularies, and the scores are combined into next-token probabilities.</figcaption>
     </figure>
 
-    <h2>Do LLMs understand compositional embeddings?</h2>
-    <p>We feed <code>Llama-3.1-8B</code> composed embeddings and read them out with Patchscopes, checking whether the model interprets each one as the intended word, either at the embedding layer (<em>embed</em>) or within its first 10 layers (<em>detok</em>). Inflections and capitalization are usually resolved correctly, including for many words that are not a single token in the vocabulary. Derivations mostly fail. Results are similar for Arabic, German, Russian and Spanish.</p>
+    <h2>LLMs understand composed words, for inflections and capitalization</h2>
+    <p>Composed embeddings of inflected and capitalized words are usually read as the intended word, including for many words that are not a single token in the vocabulary. Derivations mostly fail. We feed <code>Llama-3.1-8B</code> composed embeddings and read them out with Patchscopes, counting a word as resolved if it is recognized at the embedding layer or within the first 10 layers. Results are similar for Arabic, German, Russian and Spanish.</p>
 
-    <figure class="scroll-x">
+    <figure>
+        <div class="dotplot" role="img" aria-label="Patchscopes accuracy within the first 10 layers, in-vocabulary vs out-of-vocabulary words: inflections and capitalization are high in vocabulary and lower out of vocabulary; derivations 45% and 3%.">
+          <div class="legend"><span><i class="dot iv"></i>in vocabulary (one token)</span><span><i class="dot oov"></i>out of vocabulary (several tokens)</span></div>
+          <div class="dp-group">Inflection</div>
+          <div class="dp-row"><div class="dp-label">Plural (N)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:56%;width:40%"></span><span class="dot oov" style="left:56%"></span><span class="dot iv" style="left:96%"></span><span class="val oov" style="right:calc(44% + 10px)">56%</span><span class="val iv" style="left:calc(96% + 10px)">96%</span></div></div></div>
+          <div class="dp-row"><div class="dp-label">Plural (N) &amp; Present Sg. (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:75%;width:16%"></span><span class="dot oov" style="left:75%"></span><span class="dot iv" style="left:91%"></span><span class="val oov" style="right:calc(25% + 10px)">75%</span><span class="val iv" style="left:calc(91% + 10px)">91%</span></div></div></div>
+          <div class="dp-row"><div class="dp-label">Present Singular (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:82%;width:9%"></span><span class="dot oov" style="left:82%"></span><span class="dot iv" style="left:91%"></span><span class="val oov" style="right:calc(18% + 10px)">82%</span><span class="val iv" style="left:calc(91% + 10px)">91%</span></div></div></div>
+          <div class="dp-row"><div class="dp-label">Past (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:29%;width:52%"></span><span class="dot oov" style="left:29%"></span><span class="dot iv" style="left:81%"></span><span class="val oov" style="right:calc(71% + 10px)">29%</span><span class="val iv" style="left:calc(81% + 10px)">81%</span></div></div></div>
+          <div class="dp-row"><div class="dp-label">Past Participle (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:38%;width:55%"></span><span class="dot oov" style="left:38%"></span><span class="dot iv" style="left:93%"></span><span class="val oov" style="right:calc(62% + 10px)">38%</span><span class="val iv" style="left:calc(93% + 10px)">93%</span></div></div></div>
+          <div class="dp-row"><div class="dp-label">Gerund (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:34%;width:59%"></span><span class="dot oov" style="left:34%"></span><span class="dot iv" style="left:93%"></span><span class="val oov" style="right:calc(66% + 10px)">34%</span><span class="val iv" style="left:calc(93% + 10px)">93%</span></div></div></div>
+          <div class="dp-row"><div class="dp-label">Superlative (ADJ)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:29%;width:65%"></span><span class="dot oov" style="left:29%"></span><span class="dot iv" style="left:94%"></span><span class="val oov" style="right:calc(71% + 10px)">29%</span><span class="val iv" style="left:calc(94% + 10px)">94%</span></div></div></div>
+          <div class="dp-row"><div class="dp-label">Comparative (ADJ)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:36%;width:47%"></span><span class="dot oov" style="left:36%"></span><span class="dot iv" style="left:83%"></span><span class="val oov" style="right:calc(64% + 10px)">36%</span><span class="val iv" style="left:calc(83% + 10px)">83%</span></div></div></div>
+          <div class="dp-row agg"><div class="dp-label">Capitalization</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:85%;width:4%"></span><span class="dot oov" style="left:85%"></span><span class="dot iv" style="left:89%"></span><span class="val oov" style="right:calc(15% + 10px)">85%</span><span class="val iv" style="left:calc(89% + 10px)">89%</span></div></div></div>
+          <div class="dp-row agg"><div class="dp-label">Derivation (all)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:3%;width:42%"></span><span class="dot oov" style="left:3%"></span><span class="dot iv" style="left:45%"></span><span class="val oov" style="right:calc(97% + 10px)">3%</span><span class="val iv" style="left:calc(45% + 10px)">45%</span></div></div></div>
+          <div class="dp-row axis"><div class="dp-label"></div><div class="dp-track"><div class="dp-inner"><span class="tick" style="left:0%">0%</span><span class="tick" style="left:25%">25%</span><span class="tick" style="left:50%">50%</span><span class="tick" style="left:75%">75%</span><span class="tick" style="left:100%">100%</span></div></div></div>
+        </div>
+        <figcaption>Share of composed embeddings that <code>Llama-3.1-8B</code> resolves to the intended word within its first 10 layers (Patchscopes).</figcaption>
+        <details class="numbers">
+            <summary>Show all numbers</summary>
+            <div class="scroll-x">
         <table>
             <thead>
                 <tr><th></th><th colspan="3">In vocabulary</th><th colspan="3">Out of vocabulary</th></tr>
@@ -234,69 +254,70 @@
                 <tr><td class="sub">Gerund (V)</td><td>83%</td><td>93%</td><td>0.2k</td><td>17%</td><td>34%</td><td>3.2k</td></tr>
                 <tr><td class="sub">Superlative (ADJ)</td><td>71%</td><td>94%</td><td>31</td><td>5%</td><td>29%</td><td>0.4k</td></tr>
                 <tr><td class="sub">Comparative (ADJ)</td><td>40%</td><td>83%</td><td>30</td><td>3%</td><td>36%</td><td>0.4k</td></tr>
-                <tr class="group sep"><td>Capitalization</td><td>80%</td><td>89%</td><td>6.0k</td><td>72%</td><td>85%</td><td>8.4k</td></tr>
-                <tr class="group sep"><td>Derivation (all)</td><td>31%</td><td>45%</td><td>51</td><td>0%</td><td>3%</td><td>31.4k</td></tr>
+                <tr class="agg sep"><td>Capitalization</td><td>80%</td><td>89%</td><td>6.0k</td><td>72%</td><td>85%</td><td>8.4k</td></tr>
+                <tr class="agg sep"><td>Derivation (all)</td><td>31%</td><td>45%</td><td>51</td><td>0%</td><td>3%</td><td>31.4k</td></tr>
             </tbody>
         </table>
-        <figcaption>Patchscopes accuracy for composed embeddings in <code>Llama-3.1-8B</code>. <em>N</em> is the number of words evaluated. Per-suffix derivation results are in the paper.</figcaption>
+            </div>
+            <p class="note"><em>embed</em>: resolved at the embedding layer; <em>detok</em>: within the first 10 layers; <em>N</em>: number of words evaluated. Per-suffix derivation results are in the paper.</p>
+        </details>
     </figure>
 
-    <h2>Compositional language modeling</h2>
-    <p>We then replace the vocabulary of pretrained models with a compositional one. The backbone stays frozen: we train only the transformation vectors (under 0.001% additional parameters) and LoRA adapters on the last 8 layers, using about 5M tokens. This removes about 10k surface-form tokens from <code>Llama-3.1-8B</code> and <code>OLMo-2-7B</code> and 7.8k from <code>Qwen2.5-7B</code>. On English benchmarks, <code>Llama-3.1-8B</code> loses 1.0 point on average. In Arabic, German, Russian and Spanish, the method removes 38–45% of whole-word tokens, with drops of up to 4.5 points. Decoding is 0.8% slower.</p>
+    <h2>Pretrained LLMs adapt with a small loss</h2>
+    <p>Switching a pretrained model to a compositional vocabulary costs about one point on English benchmarks. The backbone stays frozen: we train only the transformation vectors (under 0.001% additional parameters) and LoRA adapters on the last 8 layers, using about 5M tokens. This removes about 10k surface-form tokens from <code>Llama-3.1-8B</code> and <code>OLMo-2-7B</code> and 7.8k from <code>Qwen2.5-7B</code>. In Arabic, German, Russian and Spanish, it removes 38–45% of whole-word tokens, with drops of up to 4.5 points. Decoding is 0.8% slower.</p>
 
     <figure class="scroll-x">
-        <table>
-            <thead><tr><th>Task</th><th>Baseline</th><th>Vocab Diet</th><th>Δ</th></tr></thead>
+        <table class="results">
+            <thead><tr><th>Task</th><th>Original</th><th>Vocab Diet</th><th>Δ</th></tr></thead>
             <tbody>
-                <tr><td>MMLU</td><td>65.2</td><td>64.9</td><td>−0.3</td></tr>
-                <tr><td>ARC</td><td>53.6</td><td>52.5</td><td>−1.1</td></tr>
-                <tr><td>BoolQ</td><td>83.2</td><td>83.3</td><td>+0.1</td></tr>
-                <tr><td>TriviaQA (EM)</td><td>66.5</td><td>63.3</td><td>−3.3</td></tr>
-                <tr><td>SQuAD (EM)</td><td>22.1</td><td>20.0</td><td>−2.1</td></tr>
-                <tr><td>HellaSwag</td><td>60.6</td><td>59.5</td><td>−1.1</td></tr>
-                <tr><td>Winogrande</td><td>78.1</td><td>78.6</td><td>+0.5</td></tr>
-                <tr><td>PIQA</td><td>80.3</td><td>79.1</td><td>−1.2</td></tr>
-                <tr><td>COPA</td><td>93.0</td><td>92.0</td><td>−1.0</td></tr>
-                <tr class="sep"><td><strong>Average</strong></td><td><strong>66.9</strong></td><td><strong>65.9</strong></td><td>−1.0</td></tr>
+                <tr class="group"><td colspan="4">Knowledge</td></tr>
+                <tr><td class="sub">MMLU</td><td>65.2</td><td>64.9</td><td class="delta neg">−0.3</td></tr>
+                <tr><td class="sub">ARC</td><td>53.6</td><td>52.5</td><td class="delta neg">−1.1</td></tr>
+                <tr class="group"><td colspan="4">Reading comprehension</td></tr>
+                <tr><td class="sub">BoolQ</td><td>83.2</td><td>83.3</td><td class="delta pos">+0.1</td></tr>
+                <tr><td class="sub">TriviaQA <span class="unit">EM</span></td><td>66.5</td><td>63.3</td><td class="delta neg">−3.3</td></tr>
+                <tr><td class="sub">SQuAD <span class="unit">EM</span></td><td>22.1</td><td>20.0</td><td class="delta neg">−2.1</td></tr>
+                <tr class="group"><td colspan="4">Commonsense</td></tr>
+                <tr><td class="sub">HellaSwag</td><td>60.6</td><td>59.5</td><td class="delta neg">−1.1</td></tr>
+                <tr><td class="sub">Winogrande</td><td>78.1</td><td>78.6</td><td class="delta pos">+0.5</td></tr>
+                <tr><td class="sub">PIQA</td><td>80.3</td><td>79.1</td><td class="delta neg">−1.2</td></tr>
+                <tr><td class="sub">COPA</td><td>93.0</td><td>92.0</td><td class="delta neg">−1.0</td></tr>
+                <tr class="total"><td>Average</td><td>66.9</td><td>65.9</td><td class="delta neg">−1.0</td></tr>
             </tbody>
         </table>
-        <figcaption>English downstream results for <code>Llama-3.1-8B</code> with its original vocabulary (Baseline) and a compositional vocabulary (Vocab Diet). Accuracy unless marked EM (exact match).</figcaption>
+        <figcaption>English downstream results for <code>Llama-3.1-8B</code> with its original vocabulary and with a compositional vocabulary. Accuracy, except exact match (EM) where marked.</figcaption>
     </figure>
 
-    <p>The freed slots can go where tokenization is inefficient. Replacing the 10k English surface forms in the <code>Llama-3.1-8B</code> tokenizer with 2.5k new tokens for each of four languages, at the same vocabulary size, improves bytes per token by 9.3% on average.</p>
+    <h2>Freed slots make tokenization more efficient in other languages</h2>
+    <p>Reallocating the freed slots improves bytes per token by 9.3% on average, at the same vocabulary size. We replace the 10k English surface forms in the <code>Llama-3.1-8B</code> tokenizer with 2.5k new tokens for each of four languages.</p>
 
-    <figure class="scroll-x">
-        <table>
-            <thead><tr><th>Language</th><th>Original</th><th>Reallocated</th><th>Δ</th></tr></thead>
-            <tbody>
-                <tr><td>Arabic</td><td>4.62</td><td>5.46</td><td>+18.0%</td></tr>
-                <tr><td>Russian</td><td>5.59</td><td>5.85</td><td>+4.8%</td></tr>
-                <tr><td>German</td><td>3.59</td><td>3.86</td><td>+7.5%</td></tr>
-                <tr><td>Spanish</td><td>3.80</td><td>4.07</td><td>+7.0%</td></tr>
-                <tr class="sep"><td><strong>Average</strong></td><td>4.40</td><td>4.81</td><td>+9.3%</td></tr>
-            </tbody>
-        </table>
+    <figure>
+        <div class="bars" role="img" aria-label="Bytes per token before and after reallocation: Arabic 4.62 to 5.46 (+18.0%), Russian 5.59 to 5.85 (+4.8%), German 3.59 to 3.86 (+7.5%), Spanish 3.80 to 4.07 (+7.0%), average 4.40 to 4.81 (+9.3%).">
+          <div class="legend"><span><i class="sw orig"></i>original tokenizer</span><span><i class="sw new"></i>after reallocation</span></div>
+          <div class="br-row"><div class="br-label">Arabic</div><div class="br-track"><div class="bar orig" style="width:77.0%"><span>4.62</span></div><div class="bar new" style="width:91.0%"><span>5.46</span></div></div><div class="br-delta">+18.0%</div></div>
+          <div class="br-row"><div class="br-label">Russian</div><div class="br-track"><div class="bar orig" style="width:93.2%"><span>5.59</span></div><div class="bar new" style="width:97.5%"><span>5.85</span></div></div><div class="br-delta">+4.8%</div></div>
+          <div class="br-row"><div class="br-label">German</div><div class="br-track"><div class="bar orig" style="width:59.8%"><span>3.59</span></div><div class="bar new" style="width:64.3%"><span>3.86</span></div></div><div class="br-delta">+7.5%</div></div>
+          <div class="br-row"><div class="br-label">Spanish</div><div class="br-track"><div class="bar orig" style="width:63.3%"><span>3.80</span></div><div class="bar new" style="width:67.8%"><span>4.07</span></div></div><div class="br-delta">+7.0%</div></div>
+          <div class="br-row agg"><div class="br-label">Average</div><div class="br-track"><div class="bar orig" style="width:73.3%"><span>4.40</span></div><div class="bar new" style="width:80.2%"><span>4.81</span></div></div><div class="br-delta">+9.3%</div></div>
+        </div>
         <figcaption>Bytes per token (higher is better) on held-out FineWeb-2 text, before and after reallocating the freed slots.</figcaption>
     </figure>
 
-    <h2>Pretraining with a compositional vocabulary</h2>
-    <p>Compositional vocabularies also work as a design choice for new models. We pretrain 124M-parameter models on 1B tokens, comparing a BPE baseline with an otherwise identical model whose vocabulary is reshaped compositionally. The compositional model predicts the base word first, then its transformations. This removes about 42% of vocabulary entries. English bits per byte stay nearly the same. Spanish, where the model may also compose out-of-vocabulary words, gets more efficient tokenization at somewhat higher bits per byte.</p>
+    <h2>Pretraining from scratch removes 42% of vocabulary entries</h2>
+    <p>Compositional vocabularies also work as a design choice for new models. We pretrain 124M-parameter models on 1B tokens, comparing a BPE baseline with an otherwise identical model whose vocabulary is reshaped compositionally; the compositional model predicts the base word first, then its transformations. English bits per byte stay nearly the same. Spanish, where the model may also compose out-of-vocabulary words, gets more efficient tokenization at somewhat higher bits per byte.</p>
 
     <figure class="scroll-x">
-        <table>
-            <thead>
-                <tr><th></th><th></th><th colspan="2">Bits per byte ↓</th><th colspan="2">Bytes per token ↑</th></tr>
-                <tr><th>Language</th><th>Vocab. reduction</th><th>BPE</th><th>Vocab Diet</th><th>BPE</th><th>Vocab Diet</th></tr>
-            </thead>
+        <table class="results">
+            <thead><tr><th>Language</th><th>Entries removed</th><th>Bits per byte ↓<br><span class="unit">BPE → Vocab Diet</span></th><th>Bytes per token ↑<br><span class="unit">BPE → Vocab Diet</span></th></tr></thead>
             <tbody>
-                <tr><td>English</td><td>41.6%</td><td>1.08</td><td>1.09</td><td>–</td><td>–</td></tr>
-                <tr><td>Spanish</td><td>41.8%</td><td>1.00</td><td>1.11</td><td>4.77</td><td>4.92</td></tr>
+                <tr><td>English</td><td>41.6%</td><td>1.08 → 1.09</td><td class="na">unchanged</td></tr>
+                <tr><td>Spanish</td><td>41.8%</td><td>1.00 → 1.11</td><td>4.77 → 4.92</td></tr>
             </tbody>
         </table>
-        <figcaption>Pretraining from scratch: BPE baseline vs. the same vocabulary reshaped compositionally. English keeps the baseline's set of surface forms, so its tokenization is unchanged.</figcaption>
+        <figcaption>Pretraining 124M models from scratch. English keeps the baseline's set of surface forms, so its tokenization is unchanged.</figcaption>
     </figure>
 
-    <h2>Vocabulary size and linear morphology</h2>
+    <h2>Larger vocabularies encode morphology less linearly</h2>
     <p>Across 13 models, morphology is encoded less linearly as English vocabulary size grows. Models with compact vocabularies (8–10k English words, e.g., <code>Llama-2</code>, <code>Mistral</code>) encode inflections as consistent offsets. Models with large vocabularies (about 40k, e.g., <code>Gemma-2-9B</code>) store inflected forms more as separate words, and weight tying strengthens this trend.</p>
 
     <figure>
