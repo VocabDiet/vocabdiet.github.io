@@ -111,16 +111,26 @@ pre.bibtex { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* small multiples (Patchscopes) */
 .sm { font-size: 0.85rem; }
-.sm-row { display: grid; grid-template-columns: minmax(120px, 32%) 1fr 1fr; gap: 0 18px; align-items: center; min-height: 26px; }
+.sm-row { display: grid; grid-template-columns: minmax(120px, 32%) minmax(0, 1fr) minmax(0, 1fr); gap: 0 18px; align-items: center; min-height: 26px; }
 .sm-head { align-items: end; font-weight: 600; padding-bottom: 6px; border-bottom: 1px solid var(--ink); margin-bottom: 4px; }
 .sm-head span { display: block; font-weight: 400; font-size: 0.75rem; color: var(--muted); }
 .sm-group { font-weight: 600; padding-top: 4px; }
 .sm-label { padding-left: 14px; line-height: 1.25; }
 .sm-row.agg { border-top: 1px solid #e6e8eb; margin-top: 4px; padding-top: 2px; }
 .sm-row.agg .sm-label { padding-left: 0; font-weight: 600; }
-.sm-cell { display: flex; align-items: center; gap: 6px; height: 26px; padding-right: 34px;
-    background: linear-gradient(90deg, #eef0f2 1px, transparent 1px) 0 0 / calc((100% - 34px) / 4) 100% repeat-x; }
+.sm-cell { display: flex; align-items: center; gap: 6px; height: 28px; padding-right: 92px;
+    background: linear-gradient(90deg, #eef0f2 1px, transparent 1px) 0 0 / calc((100% - 92px) / 4) 100% repeat-x; }
 .sm-bar { display: block; height: 12px; background: #1f6fb2; flex: none; max-width: calc(100% - 0px); }
-.sm-val { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+.sm-val { font-size: 0.72rem; color: var(--ink); white-space: nowrap; line-height: 1.15; }
+.sm-n { color: var(--muted); margin-left: 6px; font-size: 0.95em; }
 ul { margin: 0 0 14px; padding-left: 22px; }
 li { margin-bottom: 6px; }
+
+@media (max-width: 760px) {
+    .sm-row { grid-template-columns: 92px minmax(0, 1fr) minmax(0, 1fr); gap: 0 10px; }
+    .sm-label { padding-left: 8px; font-size: 0.8rem; }
+    .sm-cell { padding-right: 46px; background-size: calc((100% - 46px) / 4) 100%; }
+    .sm-n { display: block; margin-left: 0; }
+    .sm-n::before { content: "n="; }
+    .sm-n .ex { display: none; }
+}
