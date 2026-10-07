@@ -220,22 +220,21 @@
     <p>Composed embeddings of inflected and capitalized words are usually read as the intended word, including for many words that are not a single token in the vocabulary. Derivations mostly fail. We feed <code>Llama-3.1-8B</code> composed embeddings and read them out with Patchscopes, counting a word as resolved if it is recognized at the embedding layer or within the first 10 layers. Results are similar for Arabic, German, Russian and Spanish.</p>
 
     <figure>
-        <div class="dotplot" role="img" aria-label="Patchscopes accuracy within the first 10 layers, in-vocabulary vs out-of-vocabulary words: inflections and capitalization are high in vocabulary and lower out of vocabulary; derivations 45% and 3%.">
-          <div class="legend"><span><i class="dot iv"></i>in vocabulary (one token)</span><span><i class="dot oov"></i>out of vocabulary (several tokens)</span></div>
-          <div class="dp-group">Inflection</div>
-          <div class="dp-row"><div class="dp-label">Plural (N)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:56%;width:40%"></span><span class="dot oov" style="left:56%"></span><span class="dot iv" style="left:96%"></span><span class="val oov" style="right:calc(44% + 10px)">56%</span><span class="val iv" style="left:calc(96% + 10px)">96%</span></div></div></div>
-          <div class="dp-row"><div class="dp-label">Plural (N) &amp; Present Sg. (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:75%;width:16%"></span><span class="dot oov" style="left:75%"></span><span class="dot iv" style="left:91%"></span><span class="val oov" style="right:calc(25% + 10px)">75%</span><span class="val iv" style="left:calc(91% + 10px)">91%</span></div></div></div>
-          <div class="dp-row"><div class="dp-label">Present Singular (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:82%;width:9%"></span><span class="dot oov" style="left:82%"></span><span class="dot iv" style="left:91%"></span><span class="val oov" style="right:calc(18% + 10px)">82%</span><span class="val iv" style="left:calc(91% + 10px)">91%</span></div></div></div>
-          <div class="dp-row"><div class="dp-label">Past (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:29%;width:52%"></span><span class="dot oov" style="left:29%"></span><span class="dot iv" style="left:81%"></span><span class="val oov" style="right:calc(71% + 10px)">29%</span><span class="val iv" style="left:calc(81% + 10px)">81%</span></div></div></div>
-          <div class="dp-row"><div class="dp-label">Past Participle (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:38%;width:55%"></span><span class="dot oov" style="left:38%"></span><span class="dot iv" style="left:93%"></span><span class="val oov" style="right:calc(62% + 10px)">38%</span><span class="val iv" style="left:calc(93% + 10px)">93%</span></div></div></div>
-          <div class="dp-row"><div class="dp-label">Gerund (V)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:34%;width:59%"></span><span class="dot oov" style="left:34%"></span><span class="dot iv" style="left:93%"></span><span class="val oov" style="right:calc(66% + 10px)">34%</span><span class="val iv" style="left:calc(93% + 10px)">93%</span></div></div></div>
-          <div class="dp-row"><div class="dp-label">Superlative (ADJ)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:29%;width:65%"></span><span class="dot oov" style="left:29%"></span><span class="dot iv" style="left:94%"></span><span class="val oov" style="right:calc(71% + 10px)">29%</span><span class="val iv" style="left:calc(94% + 10px)">94%</span></div></div></div>
-          <div class="dp-row"><div class="dp-label">Comparative (ADJ)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:36%;width:47%"></span><span class="dot oov" style="left:36%"></span><span class="dot iv" style="left:83%"></span><span class="val oov" style="right:calc(64% + 10px)">36%</span><span class="val iv" style="left:calc(83% + 10px)">83%</span></div></div></div>
-          <div class="dp-row agg"><div class="dp-label">Capitalization</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:85%;width:4%"></span><span class="dot oov" style="left:85%"></span><span class="dot iv" style="left:89%"></span><span class="val oov" style="right:calc(15% + 10px)">85%</span><span class="val iv" style="left:calc(89% + 10px)">89%</span></div></div></div>
-          <div class="dp-row agg"><div class="dp-label">Derivation (all)</div><div class="dp-track"><div class="dp-inner"><span class="dp-line" style="left:3%;width:42%"></span><span class="dot oov" style="left:3%"></span><span class="dot iv" style="left:45%"></span><span class="val oov" style="right:calc(97% + 10px)">3%</span><span class="val iv" style="left:calc(45% + 10px)">45%</span></div></div></div>
-          <div class="dp-row axis"><div class="dp-label"></div><div class="dp-track"><div class="dp-inner"><span class="tick" style="left:0%">0%</span><span class="tick" style="left:25%">25%</span><span class="tick" style="left:50%">50%</span><span class="tick" style="left:75%">75%</span><span class="tick" style="left:100%">100%</span></div></div></div>
+        <div class="sm" role="img" aria-label="Patchscopes accuracy within the first 10 layers. Words in the vocabulary: inflections 81 to 96%, capitalization 89%, derivations 45%. Words split into several tokens: inflections 29 to 82%, capitalization 85%, derivations 3%.">
+          <div class="sm-row sm-head"><div></div><div>Words in the vocabulary<span>one token in the original vocabulary</span></div><div>Words split into several tokens<span>composed from a base in the vocabulary</span></div></div>
+          <div class="sm-row sm-group"><div>Inflection</div><div></div><div></div></div>
+          <div class="sm-row"><div class="sm-label">Plural (N)</div><div class="sm-cell"><span class="sm-bar" style="width:96%"></span><span class="sm-val">96%</span></div><div class="sm-cell"><span class="sm-bar" style="width:56%"></span><span class="sm-val">56%</span></div></div>
+          <div class="sm-row"><div class="sm-label">Plural (N) &amp; Present Sg. (V)</div><div class="sm-cell"><span class="sm-bar" style="width:91%"></span><span class="sm-val">91%</span></div><div class="sm-cell"><span class="sm-bar" style="width:75%"></span><span class="sm-val">75%</span></div></div>
+          <div class="sm-row"><div class="sm-label">Present Singular (V)</div><div class="sm-cell"><span class="sm-bar" style="width:91%"></span><span class="sm-val">91%</span></div><div class="sm-cell"><span class="sm-bar" style="width:82%"></span><span class="sm-val">82%</span></div></div>
+          <div class="sm-row"><div class="sm-label">Past (V)</div><div class="sm-cell"><span class="sm-bar" style="width:81%"></span><span class="sm-val">81%</span></div><div class="sm-cell"><span class="sm-bar" style="width:29%"></span><span class="sm-val">29%</span></div></div>
+          <div class="sm-row"><div class="sm-label">Past Participle (V)</div><div class="sm-cell"><span class="sm-bar" style="width:93%"></span><span class="sm-val">93%</span></div><div class="sm-cell"><span class="sm-bar" style="width:38%"></span><span class="sm-val">38%</span></div></div>
+          <div class="sm-row"><div class="sm-label">Gerund (V)</div><div class="sm-cell"><span class="sm-bar" style="width:93%"></span><span class="sm-val">93%</span></div><div class="sm-cell"><span class="sm-bar" style="width:34%"></span><span class="sm-val">34%</span></div></div>
+          <div class="sm-row"><div class="sm-label">Superlative (ADJ)</div><div class="sm-cell"><span class="sm-bar" style="width:94%"></span><span class="sm-val">94%</span></div><div class="sm-cell"><span class="sm-bar" style="width:29%"></span><span class="sm-val">29%</span></div></div>
+          <div class="sm-row"><div class="sm-label">Comparative (ADJ)</div><div class="sm-cell"><span class="sm-bar" style="width:83%"></span><span class="sm-val">83%</span></div><div class="sm-cell"><span class="sm-bar" style="width:36%"></span><span class="sm-val">36%</span></div></div>
+          <div class="sm-row agg"><div class="sm-label">Capitalization</div><div class="sm-cell"><span class="sm-bar" style="width:89%"></span><span class="sm-val">89%</span></div><div class="sm-cell"><span class="sm-bar" style="width:85%"></span><span class="sm-val">85%</span></div></div>
+          <div class="sm-row agg"><div class="sm-label">Derivation (all)</div><div class="sm-cell"><span class="sm-bar" style="width:45%"></span><span class="sm-val">45%</span></div><div class="sm-cell"><span class="sm-bar" style="width:3%"></span><span class="sm-val">3%</span></div></div>
         </div>
-        <figcaption>Share of composed embeddings that <code>Llama-3.1-8B</code> resolves to the intended word within its first 10 layers (Patchscopes).</figcaption>
+        <figcaption>Share of composed embeddings that <code>Llama-3.1-8B</code> resolves to the intended word within its first 10 layers (Patchscopes), shown separately for words the original vocabulary has as one token and words it splits into several tokens. Bars run from 0 to 100%.</figcaption>
         <details class="numbers">
             <summary>Show all numbers</summary>
             <div class="scroll-x">
@@ -263,8 +262,8 @@
         </details>
     </figure>
 
-    <h2>Pretrained LLMs adapt with a small loss</h2>
-    <p>Switching a pretrained model to a compositional vocabulary costs about one point on English benchmarks. The backbone stays frozen: we train only the transformation vectors (under 0.001% additional parameters) and LoRA adapters on the last 8 layers, using about 5M tokens. This removes about 10k surface-form tokens from <code>Llama-3.1-8B</code> and <code>OLMo-2-7B</code> and 7.8k from <code>Qwen2.5-7B</code>. In Arabic, German, Russian and Spanish, it removes 38–45% of whole-word tokens, with drops of up to 4.5 points. Decoding is 0.8% slower.</p>
+    <h2>Existing models can be adapted to a compositional vocabulary</h2>
+    <p>A pretrained model can switch to a compositional vocabulary with lightweight training, at a cost of about one point on English benchmarks. The backbone stays frozen: we train only the transformation vectors (under 0.001% additional parameters) and LoRA adapters on the last 8 layers, using about 5M tokens. This removes about 10k surface-form tokens from <code>Llama-3.1-8B</code> and <code>OLMo-2-7B</code> and 7.8k from <code>Qwen2.5-7B</code>. In Arabic, German, Russian and Spanish, it removes 38–45% of whole-word tokens, with drops of up to 4.5 points. Decoding is 0.8% slower.</p>
 
     <figure class="scroll-x">
         <table class="results">
@@ -303,18 +302,24 @@
         <figcaption>Bytes per token (higher is better) on held-out FineWeb-2 text, before and after reallocating the freed slots.</figcaption>
     </figure>
 
-    <h2>Pretraining from scratch removes 42% of vocabulary entries</h2>
-    <p>Compositional vocabularies also work as a design choice for new models. We pretrain 124M-parameter models on 1B tokens, comparing a BPE baseline with an otherwise identical model whose vocabulary is reshaped compositionally; the compositional model predicts the base word first, then its transformations. English bits per byte stay nearly the same. Spanish, where the model may also compose out-of-vocabulary words, gets more efficient tokenization at somewhat higher bits per byte.</p>
+    <h2>Trained from scratch, compositional vocabularies need 42% fewer entries</h2>
+    <p>Compositional vocabularies also work as a design choice for new models. We pretrain 124M-parameter models on 1B tokens and compare each BPE baseline with a model whose vocabulary is reshaped compositionally; the compositional model predicts the base word first, then its transformations. We test two settings:</p>
+    <ul>
+        <li><strong>English: same words, fewer entries.</strong> Starting from GPT-2's vocabulary, the compositional model covers exactly the same words as BPE but stores them with 41.6% fewer entries. Text is tokenized the same way, so compression is unchanged by design, and bits per byte stay nearly the same.</li>
+        <li><strong>Spanish: fewer entries and more words.</strong> Starting from a 32k Spanish BPE vocabulary, the model also composes words that BPE splits into several tokens. With 41.8% fewer entries it covers more words, which improves compression, at somewhat higher bits per byte.</li>
+    </ul>
 
     <figure class="scroll-x">
         <table class="results">
-            <thead><tr><th>Language</th><th>Entries removed</th><th>Bits per byte ↓<br><span class="unit">BPE → Vocab Diet</span></th><th>Bytes per token ↑<br><span class="unit">BPE → Vocab Diet</span></th></tr></thead>
+            <thead><tr><th></th><th>English</th><th>Spanish</th></tr></thead>
             <tbody>
-                <tr><td>English</td><td>41.6%</td><td>1.08 → 1.09</td><td class="na">unchanged</td></tr>
-                <tr><td>Spanish</td><td>41.8%</td><td>1.00 → 1.11</td><td>4.77 → 4.92</td></tr>
+                <tr><td>Words covered</td><td>same as BPE</td><td>BPE + composed words</td></tr>
+                <tr><td>Vocabulary entries removed</td><td>41.6%</td><td>41.8%</td></tr>
+                <tr><td>Bytes per token ↑ <span class="unit">BPE → Vocab Diet</span></td><td class="na">unchanged</td><td>4.77 → 4.92</td></tr>
+                <tr><td>Bits per byte ↓ <span class="unit">BPE → Vocab Diet</span></td><td>1.08 → 1.09</td><td>1.00 → 1.11</td></tr>
             </tbody>
         </table>
-        <figcaption>Pretraining 124M models from scratch. English keeps the baseline's set of surface forms, so its tokenization is unchanged.</figcaption>
+        <figcaption>Pretraining 124M models from scratch on 1B tokens, BPE baseline vs. the same vocabulary reshaped compositionally.</figcaption>
     </figure>
 
     <h2>Larger vocabularies encode morphology less linearly</h2>

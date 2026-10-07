@@ -6,9 +6,9 @@
 
 - The GPT-4 tokenizer has 24.6k English whole-word tokens; ignoring case leaves 17.7k, and grouping inflections and derivations leaves 14.3k base words (42% fewer). The same bases and transformations can compose 98k further English words.
 - LLMs interpret composed embeddings (base + transformation vector) as the intended word, especially for inflections and capitalization, including many out-of-vocabulary words (Patchscopes, Llama-3.1-8B; also Arabic, German, Russian, Spanish). Derivations mostly fail.
-- Post-hoc adaptation with a frozen backbone (transformation vectors plus LoRA on the last 8 layers) removes ~10k tokens from Llama-3.1-8B and OLMo-2-7B and 7.8k from Qwen2.5-7B; English downstream average 66.9 → 65.9 for Llama-3.1-8B; decoding 0.8% slower.
+- Existing models can be adapted to a compositional vocabulary with a frozen backbone (transformation vectors plus LoRA on the last 8 layers) removes ~10k tokens from Llama-3.1-8B and OLMo-2-7B and 7.8k from Qwen2.5-7B; English downstream average 66.9 → 65.9 for Llama-3.1-8B; decoding 0.8% slower.
 - Reallocating the 10k freed slots to Arabic, Russian, German and Spanish (2.5k each) improves bytes per token by 9.3% on average at the same vocabulary size.
-- Pretraining 124M models from scratch with a compositional vocabulary removes ~42% of vocabulary entries (English bits per byte 1.08 vs 1.09).
+- Pretraining 124M models from scratch with a compositional vocabulary needs ~42% fewer vocabulary entries. English: the same words as GPT-2's BPE vocabulary with 41.6% fewer entries, so tokenization is unchanged (bits per byte 1.08 vs 1.09). Spanish: 41.8% fewer entries plus composed out-of-vocabulary words, improving compression from 4.77 to 4.92 bytes per token at higher bits per byte (1.00 vs 1.11).
 - Across 13 models, morphology is encoded less linearly in embeddings as English vocabulary size grows.
 
 ## Links
